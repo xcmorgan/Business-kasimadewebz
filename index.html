@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kasimadewebz — Static Websites for Businesses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Manrope', 'sans-serif'] },
+                    colors: {
+                        matte: '#1a1a1a',
+                        softgrey: '#f5f5f5',
+                        medgrey: '#e0e0e0',
+                        textgrey: '#6b6b6b',
+                        watsapp: '#25D366',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Manrope', sans-serif; background: #ffffff; color: #1a1a1a; overflow-x: hidden; }
+
+        .slide-line {
+            position: fixed;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #d1d5db 30%, #d1d5db 70%, transparent 100%);
+            opacity: 0.3;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes slideRight {
+            0% { transform: translateX(-100vw); }
+            100% { transform: translateX(100vw); }
+        }
+        @keyframes slideLeft {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100vw); }
+        }
+        .slide-right { animation: slideRight linear infinite; }
+        .slide-left { animation: slideLeft linear infinite; }
+
+        .fade-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-card {
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1a1a1a;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .hero-title {
+            font-size: clamp(1.85rem, 11vw, 9rem);
+            white-space: nowrap;
+            line-height: 0.92;
+            letter-spacing: -0.04em;
+        }
+
+        .project-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .project-card:hover .project-img {
+            transform: scale(1.03);
+        }
+
+        /* WhatsApp Button Styles */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .whatsapp-float a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 14px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow:
+                0 0 15px rgba(37, 211, 102, 0.4),
+                0 0 40px rgba(37, 211, 102, 0.2),
+                0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .whatsapp-float a:hover {
+            background: #1ebe5d;
+            box-shadow:
+                0 0 20px rgba(37, 211, 102, 0.6),
+                0 0 60px rgba(37, 211, 102, 0.3),
+                0 6px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        .whatsapp-float a:active {
+            transform: translateY(0);
+        }
+        .whatsapp-float .wa-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        @keyframes waPulse {
+            0% { box-shadow: 0 0 15px rgba(37, 211, 102, 0.4), 0 0 40px rgba(37, 211, 102, 0.2), 0 4px 15px rgba(0,0,0,0.15); }
+            50% { box-shadow: 0 0 25px rgba(37, 211, 102, 0.6), 0 0 60px rgba(37, 211, 102, 0.35), 0 4px 15px rgba(0,0,0,0.15); }
+            100% { box-shadow: 0 0 15px rgba(37, 211, 102, 0.4), 0 0 40px rgba(37, 211, 102, 0.2), 0 4px 15px rgba(0,0,0,0.15); }
+        }
+        .whatsapp-float a {
+            animation: waPulse 2.5s ease-in-out infinite;
+        }
+        .whatsapp-float a:hover {
+            animation: none;
+        }
+
+        /* Hero image */
+        .hero-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+        .hero-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 1023px) {
+            .whatsapp-float a span.wa-text {
+                display: none;
+            }
+            .whatsapp-float a {
+                padding: 14px;
+                border-radius: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sliding Lines -->
+    <div class="slide-line slide-right" style="width: 60vw; top: 15%; animation-duration: 28s;"></div>
+    <div class="slide-line slide-left" style="width: 45vw; top: 30%; animation-duration: 35s; animation-delay: -8s;"></div>
+    <div class="slide-line slide-right" style="width: 70vw; top: 48%; animation-duration: 32s; animation-delay: -14s;"></div>
+    <div class="slide-line slide-left" style="width: 50vw; top: 65%; animation-duration: 40s; animation-delay: -5s;"></div>
+    <div class="slide-line slide-right" style="width: 55vw; top: 82%; animation-duration: 30s; animation-delay: -20s;"></div>
+    <div class="slide-line slide-left" style="width: 40vw; top: 92%; animation-duration: 38s; animation-delay: -12s;"></div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">Email copied to clipboard</div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-medgrey/50">
+        <div class="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 py-4 flex items-center justify-between">
+            <a href="#" class="text-xl font-bold tracking-tight text-matte">kasimadewebz</a>
+            <div class="hidden md:flex items-center gap-6 lg:gap-8">
+                <a href="#about" class="text-sm font-medium text-textgrey hover:text-matte transition-colors duration-300">What We Do</a>
+                <a href="#projects" class="text-sm font-medium text-textgrey hover:text-matte transition-colors duration-300">Projects</a>
+                <a href="#pricing" class="text-sm font-medium text-textgrey hover:text-matte transition-colors duration-300">Pricing</a>
+                <a href="mailto:fluentwebsites026@gmail.com" class="bg-matte text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-matte/90 transition-colors duration-300">Get in Touch</a>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-matte">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-medgrey/50 px-4 sm:px-6 py-4 space-y-4">
+            <a href="#about" class="block text-sm font-medium text-textgrey hover:text-matte transition-colors">What We Do</a>
+            <a href="#projects" class="block text-sm font-medium text-textgrey hover:text-matte transition-colors">Projects</a>
+            <a href="#pricing" class="block text-sm font-medium text-textgrey hover:text-matte transition-colors">Pricing</a>
+            <a href="mailto:fluentwebsites026@gmail.com" class="block bg-matte text-white text-sm font-semibold px-5 py-2.5 rounded-lg text-center hover:bg-matte/90 transition-colors">Get in Touch</a>
+        </div>
+    </nav>
+
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float">
+        <a href="https://wa.me/27610859002" target="_blank" rel="noopener noreferrer">
+            <svg class="wa-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            <span class="wa-text">Talk to me on WhatsApp</span>
+        </a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative z-10 min-h-screen flex items-center w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 pt-20 pb-10">
+        <div class="w-full fade-up">
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
+                <!-- Left: Text Content -->
+                <div class="order-2 lg:order-1">
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-textgrey mb-4 sm:mb-6">Static Websites for Businesses</p>
+                    <h1 class="hero-title font-bold text-matte mb-6 sm:mb-8">kasimadewebz</h1>
+                    <p class="text-base sm:text-lg md:text-xl font-light text-textgrey max-w-2xl leading-relaxed mb-8 sm:mb-10">
+                        Clean, fast, affordable static websites built for <strong class="font-semibold text-matte">resorts, lodges, guesthouses, B&amp;Bs</strong>, and small businesses that need a professional online presence — without the recurring costs.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 shrink-0">
+                        <a href="mailto:fluentwebsites026@gmail.com" class="bg-matte text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-matte/85 transition-all duration-300 text-sm whitespace-nowrap">
+                            Order Your Website
+                        </a>
+                        <a href="#about" class="text-sm font-semibold text-textgrey hover:text-matte transition-colors duration-300 flex items-center gap-2">
+                            Learn More <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+                <!-- Right: Hero Image -->
+                <div class="order-1 lg:order-2">
+                    <div class="hero-image-container aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] shadow-xl shadow-matte/10">
+                        <img src="/_images/hero.jpg" alt="kasimadewebz — Professional Static Websites">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What Are Static Websites -->
+    <section id="about" class="relative z-10 py-16 sm:py-24 md:py-32">
+        <div class="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
+            <div class="fade-up mb-10 sm:mb-16">
+                <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-textgrey mb-3 sm:mb-4">Understanding Static Websites</p>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-matte">What they are &amp; what they aren't</h2>
+            </div>
+        </div>
+
+        <div class="w-full grid md:grid-cols-2 gap-0">
+            <div class="fade-up bg-softgrey p-6 sm:p-8 md:p-10 lg:p-14">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-matte rounded-xl flex items-center justify-center mb-5 sm:mb-6">
+                    <i data-lucide="check" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-matte mb-4 sm:mb-5">What static websites CAN do</h3>
+                <ul class="space-y-2.5 sm:space-y-3 text-textgrey text-sm sm:text-[15px] leading-relaxed">
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 sm:mt-1 text-matte/60 shrink-0"></i>
+                        <span>Display your business info — services, rooms, rates, gallery, location, contact details</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 sm:mt-1 text-matte/60 shrink-0"></i>
+                        <span>Look professional and build trust with potential guests or clients</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 sm:mt-1 text-matte/60 shrink-0"></i>
+                        <span>Link to your WhatsApp, social media, or Google Maps</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 sm:mt-1 text-matte/60 shrink-0"></i>
+                        <span>Load extremely fast because there's no database or server processing</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 sm:mt-1 text-matte/60 shrink-0"></i>
+                        <span>Be hosted for free or very cheap on platforms like Netlify, Vercel, or GitHub Pages</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 sm:mt-1 text-matte/60 shrink-0"></i>
+                        <span>Showcase image galleries, embedded videos, and PDF menus/brochures</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="fade-up bg-white border border-medgrey p-6 sm:p-8 md:p-10 lg:p-14" style="transition-delay: 0.1s;">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-textgrey/10 rounded-xl flex items-center justify-center mb-5 sm:mb-6">
+                    <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6 text-textgrey"></i>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-matte mb-4 sm:mb-5">What static websites CANNOT do</h3>
+                <ul class="space-y-2.5 sm:space-y-3 text-textgrey text-sm sm:text-[15px] leading-relaxed">
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 sm:mt-1 text-textgrey/50 shrink-0"></i>
+                        <span>Process online bookings or payments — you'll need a third-party link (e.g. Bookings.com, WhatsApp form)</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 sm:mt-1 text-textgrey/50 shrink-0"></i>
+                        <span>Have a user login system, dashboard, or admin panel</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 sm:mt-1 text-textgrey/50 shrink-0"></i>
+                        <span>Dynamically update content — changes require me to edit the code and re-upload</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 sm:mt-1 text-textgrey/50 shrink-0"></i>
+                        <span>Run a blog with comments, categories, or search — they're not CMS-based</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 sm:mt-1 text-textgrey/50 shrink-0"></i>
+                        <span>Collect form submissions without a third-party service (e.g. Formspree, Web3Forms)</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 sm:gap-3">
+                        <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 sm:mt-1 text-textgrey/50 shrink-0"></i>
+                        <span>Scale into a full web app — they're meant to be simple, informative pages</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="relative z-10 py-16 sm:py-24 md:py-32 bg-softgrey">
+        <div class="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 mb-10 sm:mb-16">
+            <div class="fade-up flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-textgrey mb-3 sm:mb-4">Portfolio</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-matte">Projects</h2>
+                </div>
+                <p class="text-sm text-textgrey max-w-xs">More projects will be added here as they're completed.</p>
+            </div>
+        </div>
+
+        <div class="w-full grid sm:grid-cols-2 lg:grid-cols-3 gap-0">
+            <!-- Project Card 1 — Blanco (REAL) -->
+            <a href="/_projects/Kasimadewebz-Profile/blanco.html" class="project-card fade-up bg-white border-b border-r border-medgrey/50 block">
+                <div class="aspect-[4/3] overflow-hidden">
+                    <img src="_images/blanco.jpg" alt="Blanco — Profile Website" class="project-img">
+                </div>
+                <div class="p-5 sm:p-6 lg:p-8">
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-textgrey mb-2">Profile</p>
+                    <h4 class="text-base sm:text-lg font-bold text-matte mb-2">Blanco</h4>
+                    <p class="text-sm text-textgrey leading-relaxed">A personal profile website with a clean, minimal design. Website like this: R300</p>
+                </div>
+            </a>
+
+            <!-- Project Card 2 — Guesthouse (Demo) -->
+            <a href="/_projects/_guesthouse/guesthouse.html" class="project-card fade-up bg-white border-b border-r border-medgrey/50 block" style="transition-delay: 0.1s;">
+                <div class="aspect-[4/3] overflow-hidden">
+                    <img src="/_projects/_guesthouse/_images/guesthouse.jpg" alt="Sample Guesthouse Website" class="project-img">
+                </div>
+                <div class="p-5 sm:p-6 lg:p-8">
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-textgrey mb-2">Guesthouse · Demo</p>
+                    <h4 class="text-base sm:text-lg font-bold text-matte mb-2">Sample Guesthouse Website</h4>
+                    <p class="text-sm text-textgrey leading-relaxed">For demonstration purposes — single-page site with gallery, contact section, and embedded map.</p>
+                </div>
+            </a>
+
+            <!-- Project Card 3 — KswResorts (Demo) -->
+            <a href="/_projects/_resort/resort.html" class="project-card fade-up bg-white border-b sm:border-b-0 border-medgrey/50 block" style="transition-delay: 0.2s;">
+                <div class="aspect-[4/3] overflow-hidden">
+                    <img src="_projects/_resort/_images/resort.jpg" alt="KswResorts — Sample Resort Website" class="project-img">
+                </div>
+                <div class="p-5 sm:p-6 lg:p-8">
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-textgrey mb-2">Resort · Demo</p>
+                    <h4 class="text-base sm:text-lg font-bold text-matte mb-2">KswResorts</h4>
+                    <p class="text-sm text-textgrey leading-relaxed">For demonstration purposes — full-width imagery, facilities section, and booking link integration.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="relative z-10 py-16 sm:py-24 md:py-32">
+        <div class="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
+            <div class="fade-up mb-10 sm:mb-16">
+                <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-textgrey mb-3 sm:mb-4">Pricing</p>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-matte mb-3 sm:mb-4">One price. No surprises.</h2>
+                <p class="text-textgrey text-base sm:text-lg font-light">A complete static website built and delivered.</p>
+            </div>
+
+            <div class="grid md:grid-cols-5 gap-6 md:gap-0">
+                <div class="md:col-span-2 fade-up">
+                    <div class="bg-softgrey rounded-2xl md:rounded-r-none md:rounded-l-2xl p-6 sm:p-8 md:p-10 h-full flex flex-col justify-between border border-medgrey/50 md:border-r-0">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-matte mb-4">What's included</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <i data-lucide="check" class="w-4 h-4 mt-1 text-matte shrink-0"></i>
+                                    <span class="text-sm sm:text-[15px] text-textgrey">Custom-designed pages (up to 5 sections)</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i data-lucide="check" class="w-4 h-4 mt-1 text-matte shrink-0"></i>
+                                    <span class="text-sm sm:text-[15px] text-textgrey">Mobile-responsive layout</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i data-lucide="check" class="w-4 h-4 mt-1 text-matte shrink-0"></i>
+                                    <span class="text-sm sm:text-[15px] text-textgrey">Image gallery &amp; contact section</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i data-lucide="check" class="w-4 h-4 mt-1 text-matte shrink-0"></i>
+                                    <span class="text-sm sm:text-[15px] text-textgrey">Free hosting setup guidance</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i data-lucide="check" class="w-4 h-4 mt-1 text-matte shrink-0"></i>
+                                    <span class="text-sm sm:text-[15px] text-textgrey">Delivery within a few days</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-medgrey">
+                            <a href="https://www.mediafire.com/file/xdwhw0cx3ngc7xo/clientRequirements.pdf/file" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm font-semibold text-matte hover:underline underline-offset-4 transition-colors">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                Download Client Requirements PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 fade-up" style="transition-delay: 0.1s;">
+                    <div class="bg-matte rounded-2xl md:rounded-l-none md:rounded-r-2xl p-6 sm:p-8 md:p-10 lg:p-14 text-white h-full flex flex-col justify-between border border-medgrey/50 md:border-l-0">
+                        <div>
+                            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-4 sm:mb-6">Static Website</p>
+                            <div class="flex items-end gap-2 mb-4 sm:mb-6">
+                                <span class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">R600</span>
+                                <span class="text-white/50 text-base sm:text-lg font-medium mb-1 sm:mb-2">once-off</span>
+                            </div>
+
+                            <p class="text-sm text-white/40 mb-6 sm:mb-8">R150 deposit to start, remaining R450 on completion.</p>
+
+                            <div class="bg-white/10 rounded-xl p-4 sm:p-5 mb-6 sm:mb-8">
+                                <p class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+                                    <i data-lucide="info" class="w-4 h-4 text-white/50"></i>
+                                    Domain name not included
+                                </p>
+                                <p class="text-sm text-white/60 leading-relaxed">
+                                    A domain name is the web address people type to find you — for example, <strong class="font-semibold text-white/90">www.yourlodge.co.za</strong> or <strong class="font-semibold text-white/90">www.mountainviewguesthouse.com</strong>. Domain names are purchased separately from registrars like <strong class="font-medium text-white/80">Hostinger</strong>, <strong class="font-medium text-white/80">Namecheap</strong>, or <strong class="font-medium text-white/80">GoDaddy</strong> and typically cost around R100–R200/year.
+                                </p>
+                            </div>
+
+                            <p class="text-[11px] text-white/30">Prices subject to change.</p>
+                        </div>
+
+                        <a href="mailto:fluentwebsites026@gmail.com" class="inline-block bg-white text-matte font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-lg hover:bg-white/90 transition-all duration-300 text-sm text-center">
+                            Order Now — R600
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suitable For -->
+    <section class="relative z-10 py-16 sm:py-24 md:py-32 bg-softgrey">
+        <div class="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 mb-10 sm:mb-16">
+            <div class="fade-up">
+                <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-textgrey mb-3 sm:mb-4">Who It's For</p>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-matte">Perfect for</h2>
+            </div>
+        </div>
+
+        <div class="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-0">
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b border-r border-medgrey/50">
+                <i data-lucide="palmtree" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Resorts</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b border-r border-medgrey/50" style="transition-delay: 0.04s;">
+                <i data-lucide="home" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Lodges</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b border-r border-medgrey/50" style="transition-delay: 0.08s;">
+                <i data-lucide="bed-double" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Guesthouses</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b sm:border-r border-medgrey/50" style="transition-delay: 0.12s;">
+                <i data-lucide="coffee" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">B&amp;Bs</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b md:border-b-0 border-r border-medgrey/50" style="transition-delay: 0.16s;">
+                <i data-lucide="utensils" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Restaurants</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b md:border-b-0 border-r border-medgrey/50" style="transition-delay: 0.2s;">
+                <i data-lucide="scissors" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Salons</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b md:border-b-0 border-r border-medgrey/50" style="transition-delay: 0.24s;">
+                <i data-lucide="wrench" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Services</p>
+            </div>
+            <div class="fade-up bg-white p-5 sm:p-6 md:p-8 lg:p-10 border-b md:border-b-0 border-medgrey/50" style="transition-delay: 0.28s;">
+                <i data-lucide="store" class="w-6 h-6 sm:w-8 sm:h-8 text-matte mb-3 sm:mb-4"></i>
+                <p class="font-semibold text-matte text-sm sm:text-base">Small Businesses</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact / CTA -->
+    <section class="relative z-10 py-16 sm:py-24 md:py-32">
+        <div class="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
+            <div class="grid md:grid-cols-2 gap-10 md:gap-16 lg:gap-24 items-center">
+                <div class="fade-up">
+                    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-textgrey mb-3 sm:mb-4">Get Started</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-matte mb-5 sm:mb-6">Ready to get online?</h2>
+                    <p class="text-textgrey text-base sm:text-lg font-light leading-relaxed mb-8 sm:mb-10">
+                        Send me an email with your business name, what you do, and any content or images you'd like on your site. I'll take it from there.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="mailto:fluentwebsites026@gmail.com?subject=New%20Website%20Order" class="inline-block bg-matte text-white font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-lg hover:bg-matte/85 transition-all duration-300 text-sm text-center">
+                            Send an Email
+                        </a>
+                        <a href="https://www.mediafire.com/file/xdwhw0cx3ngc7xo/clientRequirements.pdf/file" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 border border-medgrey text-matte font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-lg hover:bg-softgrey transition-all duration-300 text-sm">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            Client Requirements PDF
+                        </a>
+                    </div>
+                </div>
+
+                <div class="fade-up" style="transition-delay: 0.1s;">
+                    <div class="bg-softgrey rounded-2xl p-8 sm:p-10 md:p-12 border border-medgrey/50 flex flex-col items-center text-center gap-4">
+                        <div class="w-14 h-14 bg-matte rounded-2xl flex items-center justify-center">
+                            <i data-lucide="mail" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <button id="copyEmailBtn" class="text-base sm:text-lg md:text-xl font-semibold text-matte hover:underline underline-offset-4 cursor-pointer block">
+                                fluentwebsites026@gmail.com
+                            </button>
+                            <span class="text-xs text-textgrey mt-1 block">Click to copy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-medgrey/50 py-8 sm:py-10 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
+        <div class="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <p class="text-xs sm:text-sm text-textgrey">&copy; 2026 kasimadewebz. All rights reserved.</p>
+            <a href="mailto:fluentwebsites026@gmail.com" class="text-xs sm:text-sm text-textgrey hover:text-matte transition-colors">fluentwebsites026@gmail.com</a>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        let menuOpen = false;
+        mobileMenuBtn.addEventListener('click', () => {
+            menuOpen = !menuOpen;
+            mobileMenu.classList.toggle('hidden', !menuOpen);
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuOpen = false;
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        const copyBtn = document.getElementById('copyEmailBtn');
+        const toast = document.getElementById('toast');
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText('fluentwebsites026@gmail.com').then(() => {
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2500);
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
